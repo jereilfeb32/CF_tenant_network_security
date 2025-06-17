@@ -1,0 +1,11 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "Security-Perimeter"
+    },
+    {
+        "ParameterKey": "VpcId",
+        "ParameterValue": "vpc-0d1be63897054f86e"
+      }
+  ]
+  

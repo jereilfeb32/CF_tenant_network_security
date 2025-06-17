@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Add routes in route tables pointing to Gateway Load Balancer Endpoints.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Project name prefix
+
+  GWLBeEndpointIdAZ1:
+    Type: String
+    Description: GWLBe endpoint ID for AZ1
+
+  GWLBeEndpointIdAZ2:
+    Type: String
+    Description: GWLBe endpoint ID for AZ2
+
+  GWLBeEndpointIdAZ3:
+    Type: String
+    Description: GWLBe endpoint ID for AZ3
+
+  RouteTableIdAZ1:
+    Type: String
+    Description: Route Table ID for subnet in AZ1
+
+  RouteTableIdAZ2:
+    Type: String
+    Description: Route Table ID for subnet in AZ2
+
+  RouteTableIdAZ3:
+    Type: String
+    Description: Route Table ID for subnet in AZ3
+
+  RouteDestinationCidr:
+    Type: String
+    Description: CIDR block to route through GWLBe (e.g., 0.0.0.0/0)
+
+Resources:
+  GWLBERouteAZ1:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableIdAZ1
+      DestinationCidrBlock: !Ref RouteDestinationCidr
+      VpcEndpointId: !Ref GWLBeEndpointIdAZ1
+
+  GWLBERouteAZ2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableIdAZ2
+      DestinationCidrBlock: !Ref RouteDestinationCidr
+      VpcEndpointId: !Ref GWLBeEndpointIdAZ2
+
+  GWLBERouteAZ3:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref RouteTableIdAZ3
+      DestinationCidrBlock: !Ref RouteDestinationCidr
+      VpcEndpointId: !Ref GWLBeEndpointIdAZ3
+
+Outputs:
+  GWLBeEndpointIdAZ1Output:
+    Description: The GWLBe endpoint ID for AZ1
+    Value: !Ref GWLBeEndpointIdAZ1
+    Export:
+      Name: !Sub "${ProjectName}-GWLBeEndpointIdAZ1"
+
+  GWLBeEndpointIdAZ2Output:
+    Description: The GWLBe endpoint ID for AZ2
+    Value: !Ref GWLBeEndpointIdAZ2
+    Export:
+      Name: !Sub "${ProjectName}-GWLBeEndpointIdAZ2"
+
+  GWLBeEndpointIdAZ3Output:
+    Description: The GWLBe endpoint ID for AZ3
+    Value: !Ref GWLBeEndpointIdAZ3
+    Export:
+      Name: !Sub "${ProjectName}-GWLBeEndpointIdAZ3"
+
+  RouteTableIdAZ1Output:
+    Description: The Route Table ID for AZ1
+    Value: !Ref RouteTableIdAZ1
+    Export:
+      Name: !Sub "${ProjectName}-RouteTableIdAZ1"
+
+  RouteTableIdAZ2Output:
+    Description: The Route Table ID for AZ2
+    Value: !Ref RouteTableIdAZ2
+    Export:
+      Name: !Sub "${ProjectName}-RouteTableIdAZ2"
+
+  RouteTableIdAZ3Output:
+    Description: The Route Table ID for AZ3
+    Value: !Ref RouteTableIdAZ3
+    Export:
+      Name: !Sub "${ProjectName}-RouteTableIdAZ3"
+
+  RouteDestinationCidrOutput:
+    Description: The CIDR block for routing through GWLBe
+    Value: !Ref RouteDestinationCidr
+    Export:
+      Name: !Sub "${ProjectName}-RouteDestinationCidr"

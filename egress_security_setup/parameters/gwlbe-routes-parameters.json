@@ -1,0 +1,35 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "spoke-vpc"
+    },
+    {
+      "ParameterKey": "GWLBeEndpointIdAZ1",
+      "ParameterValue": "vpce-0db73bcfe220ac90c"
+    },
+    {
+      "ParameterKey": "GWLBeEndpointIdAZ2",
+      "ParameterValue": "vpce-0865426cfc6b63273"
+    },
+    {
+      "ParameterKey": "GWLBeEndpointIdAZ3",
+      "ParameterValue": "vpce-0b1ae1bc6603e4cf8"
+    },
+    {
+      "ParameterKey": "RouteTableIdAZ1",
+      "ParameterValue": "rtb-0ef3318ac1154d0d6"
+    },
+    {
+      "ParameterKey": "RouteTableIdAZ2",
+      "ParameterValue": "rtb-0610b355e998e09ed"
+    },
+    {
+      "ParameterKey": "RouteTableIdAZ3",
+      "ParameterValue": "rtb-0dc2e41f1be12e5cb"
+    },
+    {
+      "ParameterKey": "RouteDestinationCidr",
+      "ParameterValue": "0.0.0.0/0"
+    }
+  ]
+  

@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Security Group for FortiGate NGFW Instances in Security Subnet
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: The name of the project
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The ID of the VPC where the security group will be created
+
+Resources:
+  FortiGateSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: FortiGate NGFW Security Group
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 203.0.113.10/32  # Replace with your admin IP for SSH
+
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 203.0.113.10/32  # Replace with trusted IP block
+
+        - IpProtocol: tcp
+          FromPort: 703
+          ToPort: 703
+          CidrIp: 10.0.0.0/16  # Use your internal VPC CIDR
+
+        - IpProtocol: udp
+          FromPort: 6081
+          ToPort: 6081
+          CidrIp: 10.0.10.0/24  # Replace with your GWLB subnet CIDR
+
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-fortigate-sg"
+
+Outputs:
+  SecurityGroupId:
+    Description: ID of the FortiGate NGFW Security Group
+    Value: !Ref FortiGateSecurityGroup
+    Export:
+      Name: !Sub "${ProjectName}-FortiGateSecurityGroupId"

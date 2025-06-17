@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: GWLB stack with Endpoint Service and exportable Service Name
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Project name
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC ID
+
+  GWLBSubnetIds:
+    Type: CommaDelimitedList
+    Description: List of Subnet IDs (1 per AZ)
+
+Resources:
+  GWLBTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref VpcId
+      Protocol: GENEVE
+      Port: 6081
+      TargetType: instance
+      HealthCheckProtocol: TCP
+      HealthCheckPort: traffic-port
+      HealthCheckEnabled: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-gwlb-tg"
+
+  GWLB:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Type: gateway
+      Subnets: !Ref GWLBSubnetIds
+      LoadBalancerAttributes:
+        - Key: load_balancing.cross_zone.enabled
+          Value: 'true'
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-gwlb"
+
+  GWLBListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref GWLB
+      Protocol: GENEVE
+      Port: 6081
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref GWLBTargetGroup
+
+  GWLBEndpointService:
+    Type: AWS::EC2::VPCEndpointService
+    Properties:
+      AcceptanceRequired: false
+      GatewayLoadBalancerArns:
+        - !Ref GWLB
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-gwlb-endpoint-service"
+
+  GWLBEndpointServicePermission:
+    Type: AWS::EC2::VPCEndpointServicePermissions
+    Properties:
+      ServiceId: !Ref GWLBEndpointService
+      AllowedPrincipals:
+        - arn:aws:iam::975050199901:root  # Replace with your account ID or appropriate principal
+
+Outputs:
+  GWLBArn:
+    Value: !Ref GWLB
+    Export:
+      Name: !Sub "${ProjectName}-GWLBArn"
+
+  GWLBTargetGroupArn:
+    Value: !Ref GWLBTargetGroup
+    Export:
+      Name: !Sub "${ProjectName}-GWLBTargetGroupArn"
+
+  GWLBServiceName:
+    Description: Export the full VPCE service name to be consumed by GWLBe stack
+    Value: !Sub "com.amazonaws.vpce.${AWS::Region}.${GWLBEndpointService}"
+    Export:
+      Name: !Sub "${ProjectName}-GWLBServiceName"

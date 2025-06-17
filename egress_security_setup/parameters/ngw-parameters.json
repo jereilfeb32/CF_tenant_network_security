@@ -1,0 +1,14 @@
+[
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "egress"
+  },
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "vpc-011a749c8c5c39805"
+  },
+  {
+    "ParameterKey": "PublicSubnetIds",
+    "ParameterValue": "subnet-03a42f57e1b335913,subnet-066b42e4d6c2f8afa,subnet-0a8715af944dcfd80"
+  }
+]

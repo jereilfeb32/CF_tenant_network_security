@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Production-ready EC2 Auto Scaling Group in Security Subnets with GWLB support for FortiGate NGFW
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Project name for resource tagging
+
+  SecuritySubnetIds:
+    Type: CommaDelimitedList
+    Description: Subnet IDs for EC2 primary ENIs (Security Subnets)
+
+  GWLBSubnetIds:
+    Type: CommaDelimitedList
+    Description: GWLB Subnets across AZs, must be same count and AZ order as SecuritySubnetIds
+
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: Security Group for EC2 instances
+
+  AmiId:
+    Type: AWS::EC2::Image::Id
+    Description: FortiGate-compatible AMI ID
+
+  GWLBTargetGroupArn:
+    Type: String
+    Description: ARN of the GWLB Target Group
+
+  KeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of existing EC2 Key Pair
+
+  InstanceType:
+    Type: String
+    Default: c6i.large
+    AllowedValues:
+      - t3.micro
+      - t3.small
+      - c6i.large
+    Description: Instance type for FortiGate EC2
+
+  NumberOfAZs:
+    Type: Number
+    Default: 3
+    Description: Number of AZs to span
+
+Resources:
+  InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${ProjectName}-ec2-role"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: AllowBasicOperations
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:Describe*
+                  - logs:*
+                  - autoscaling:CompleteLifecycleAction
+                Resource: "*"
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub "${ProjectName}-profile"
+      Roles:
+        - !Ref InstanceRole
+      Path: "/"
+
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub "${ProjectName}-lt"
+      LaunchTemplateData:
+        KeyName: !Ref KeyPairName
+        ImageId: !Ref AmiId
+        InstanceType: !Ref InstanceType
+        IamInstanceProfile:
+          Arn: !GetAtt InstanceProfile.Arn
+        Monitoring:
+          Enabled: true
+        MetadataOptions:
+          HttpTokens: required
+          HttpEndpoint: enabled
+        NetworkInterfaces:
+          - DeviceIndex: 0
+            AssociatePublicIpAddress: false
+            Groups:
+              - !Ref SecurityGroupId
+        BlockDeviceMappings:
+          - DeviceName: /dev/xvda
+            Ebs:
+              VolumeSize: 8
+              VolumeType: gp3
+              DeleteOnTermination: true
+        TagSpecifications:
+          - ResourceType: instance
+            Tags:
+              - Key: Name
+                Value: !Sub "${ProjectName}-instance"
+
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DependsOn:
+      - LaunchTemplate
+      - InstanceProfile
+    Properties:
+      VPCZoneIdentifier: !Ref SecuritySubnetIds
+      MinSize: !Ref NumberOfAZs
+      MaxSize: !Ref NumberOfAZs
+      DesiredCapacity: !Ref NumberOfAZs
+      HealthCheckType: EC2
+      HealthCheckGracePeriod: 180
+      Cooldown: 300
+      TerminationPolicies:
+        - OldestInstance
+        - Default
+      MixedInstancesPolicy:
+        LaunchTemplate:
+          LaunchTemplateSpecification:
+            LaunchTemplateId: !Ref LaunchTemplate
+            Version: !GetAtt LaunchTemplate.LatestVersionNumber
+          Overrides:
+            - InstanceType: !Ref InstanceType
+              LaunchTemplateSpecification:
+                LaunchTemplateId: !Ref LaunchTemplate
+                Version: !GetAtt LaunchTemplate.LatestVersionNumber
+              WeightedCapacity: "1"
+        InstancesDistribution:
+          OnDemandPercentageAboveBaseCapacity: 100
+      LifecycleHookSpecificationList:
+        - LifecycleTransition: autoscaling:EC2_INSTANCE_LAUNCHING
+          LifecycleHookName: !Sub "${ProjectName}-hook-launching"
+          HeartbeatTimeout: 300
+          DefaultResult: CONTINUE
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-asg-instance"
+          PropagateAtLaunch: true
+
+Outputs:
+  AutoScalingGroupName:
+    Description: Name of the Auto Scaling Group
+    Value: !Ref AutoScalingGroup
+
+  LaunchTemplateId:
+    Description: Launch Template ID
+    Value: !Ref LaunchTemplate
+
+  KeyPairUsed:
+    Description: EC2 Key Pair
+    Value: !Ref KeyPairName

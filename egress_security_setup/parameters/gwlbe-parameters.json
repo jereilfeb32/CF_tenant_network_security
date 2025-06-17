@@ -1,0 +1,19 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "spoke-vpc"
+    },
+    {
+      "ParameterKey": "VpcId",
+      "ParameterValue": "vpc-011a749c8c5c39805"
+    },
+    {
+      "ParameterKey": "GWLBEndpointSubnetIds",
+      "ParameterValue": "subnet-0b820ba894cc365aa,subnet-06492ada5f2909a78,subnet-07072b83edf7c5fa2"
+    },
+    {
+      "ParameterKey": "GWLBEndpointServiceName",
+      "ParameterValue": "com.amazonaws.vpce.ap-southeast-1.vpce-svc-03b139aa082f90800"
+    }
+  ]
+  

@@ -1,0 +1,108 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  High availability NAT Gateway stack with 1 NAT Gateway per AZ for production use.
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Prefix for naming resources
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC to attach NAT Gateways
+
+  PublicSubnetIds:
+    Type: CommaDelimitedList
+    Description: List of public subnet IDs (one per AZ)
+
+Resources:
+
+  # Elastic IPs
+  NatEIP1:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-eip-az1"
+
+  NatEIP2:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-eip-az2"
+
+  NatEIP3:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-eip-az3"
+
+  # NAT Gateways
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP1.AllocationId
+      SubnetId: !Select [0, !Ref PublicSubnetIds]
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-natgw-az1"
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP2.AllocationId
+      SubnetId: !Select [1, !Ref PublicSubnetIds]
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-natgw-az2"
+
+  NatGateway3:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP3.AllocationId
+      SubnetId: !Select [2, !Ref PublicSubnetIds]
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-natgw-az3"
+
+Outputs:
+  NatGateway1Id:
+    Description: NAT Gateway in AZ1
+    Value: !Ref NatGateway1
+    Export:
+      Name: !Sub "${ProjectName}-natgw-az1"
+
+  NatGateway2Id:
+    Description: NAT Gateway in AZ2
+    Value: !Ref NatGateway2
+    Export:
+      Name: !Sub "${ProjectName}-natgw-az2"
+
+  NatGateway3Id:
+    Description: NAT Gateway in AZ3
+    Value: !Ref NatGateway3
+    Export:
+      Name: !Sub "${ProjectName}-natgw-az3"
+
+  NatEIP1Id:
+    Description: Elastic IP for NAT Gateway in AZ1
+    Value: !Ref NatEIP1
+    Export:
+      Name: !Sub "${ProjectName}-nat-eip-az1"
+
+  NatEIP2Id:
+    Description: Elastic IP for NAT Gateway in AZ2
+    Value: !Ref NatEIP2
+    Export:
+      Name: !Sub "${ProjectName}-nat-eip-az2"
+
+  NatEIP3Id:
+    Description: Elastic IP for NAT Gateway in AZ3
+    Value: !Ref NatEIP3
+    Export:
+      Name: !Sub "${ProjectName}-nat-eip-az3"

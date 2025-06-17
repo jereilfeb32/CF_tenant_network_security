@@ -1,0 +1,30 @@
+[
+  {
+    "ParameterKey": "ProjectName",
+    "ParameterValue": "customer-egress"
+  },
+  {
+    "ParameterKey": "VpcCidr",
+    "ParameterValue": "10.100.0.0/16"
+  },
+  {
+    "ParameterKey": "AvailabilityZones",
+    "ParameterValue": "ap-southeast-1a,ap-southeast-1b,ap-southeast-1c"
+  },
+  {
+    "ParameterKey": "PublicSubnetCidrs",
+    "ParameterValue": "10.100.0.0/24,10.100.1.0/24,10.100.2.0/24"
+  },
+  {
+    "ParameterKey": "PrivateSubnetCidrs",
+    "ParameterValue": "10.100.10.0/24,10.100.11.0/24,10.100.12.0/24"
+  },
+  {
+    "ParameterKey": "TGWSubnetCidrs",
+    "ParameterValue": "10.100.20.0/24,10.100.21.0/24,10.100.22.0/24"
+  },
+  {
+    "ParameterKey": "GWLBSubnetCidrs",
+    "ParameterValue": "10.100.30.0/24,10.100.31.0/24,10.100.32.0/24"
+  }
+]

@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Gateway Load Balancer Endpoint (GWLBe) stack for 3 AZs
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: Project name prefix for resource naming
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: VPC where the GWLB Endpoint will be deployed
+
+  GWLBEndpointSubnetIds:
+    Type: CommaDelimitedList
+    Description: List of 3 Subnet IDs (one per AZ) for the GWLB Endpoints
+
+Resources:
+  GWLBEndpoint1:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName:
+        Fn::ImportValue:
+          Fn::Sub: "${ProjectName}-GWLBServiceName"
+      VpcId: !Ref VpcId
+      SubnetIds:
+        - !Select [0, !Ref GWLBEndpointSubnetIds]
+      VpcEndpointType: GatewayLoadBalancer
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-gwlbe-az1"
+
+  GWLBEndpoint2:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName:
+        Fn::ImportValue:
+          Fn::Sub: "${ProjectName}-GWLBServiceName"
+      VpcId: !Ref VpcId
+      SubnetIds:
+        - !Select [1, !Ref GWLBEndpointSubnetIds]
+      VpcEndpointType: GatewayLoadBalancer
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-gwlbe-az2"
+
+  GWLBEndpoint3:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName:
+        Fn::ImportValue:
+          Fn::Sub: "${ProjectName}-GWLBServiceName"
+      VpcId: !Ref VpcId
+      SubnetIds:
+        - !Select [2, !Ref GWLBEndpointSubnetIds]
+      VpcEndpointType: GatewayLoadBalancer
+      Tags:
+        - Key: Name
+          Value: !Sub "${ProjectName}-gwlbe-az3"
+
+Outputs:
+  GWLBEndpoint1Id:
+    Description: GWLBe ID for AZ1
+    Value: !Ref GWLBEndpoint1
+    Export:
+      Name: !Sub "${ProjectName}-GWLBEndpoint1"
+
+  GWLBEndpoint2Id:
+    Description: GWLBe ID for AZ2
+    Value: !Ref GWLBEndpoint2
+    Export:
+      Name: !Sub "${ProjectName}-GWLBEndpoint2"
+
+  GWLBEndpoint3Id:
+    Description: GWLBe ID for AZ3
+    Value: !Ref GWLBEndpoint3
+    Export:
+      Name: !Sub "${ProjectName}-GWLBEndpoint3"

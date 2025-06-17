@@ -1,0 +1,35 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "Security-Perimeter"
+    },
+    {
+      "ParameterKey": "SecuritySubnetIds",
+      "ParameterValue": "subnet-0429565ce43a8a036,subnet-0099117fa3ca5de10,subnet-0fa30f29a3faa6f91"
+    },
+    {
+      "ParameterKey": "SecurityGroupId",
+      "ParameterValue": "sg-0758a2d66af40af7b"
+    },
+    {
+      "ParameterKey": "AmiId",
+      "ParameterValue": "ami-0435fcf800fb5418d"
+    },
+    {
+      "ParameterKey": "GWLBSubnetIds",
+      "ParameterValue": "subnet-0e72acc5f24f97ff9,subnet-0e2f3b91868877047,subnet-02654136712cfd561"
+    },
+    {
+      "ParameterKey": "GWLBTargetGroupArn",
+      "ParameterValue": "arn:aws:elasticloadbalancing:ap-southeast-1:975050199901:targetgroup/perime-GWLBT-W6GAV6K28ZU6/002fae890312103e86"
+    },
+    {
+      "ParameterKey": "KeyPairName",
+      "ParameterValue": "ngfw-key-pair"
+    },
+    {
+      "ParameterKey": "InstanceType",
+      "ParameterValue": "t3.micro"
+    }
+  ]
+  

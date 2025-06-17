@@ -1,0 +1,15 @@
+[
+    {
+      "ParameterKey": "ProjectName",
+      "ParameterValue": "Security-Perimeter"
+    },
+    {
+      "ParameterKey": "VpcId",
+      "ParameterValue": "vpc-0d1be63897054f86e"
+    },
+    {
+      "ParameterKey": "GWLBEndpointSubnetIds",
+      "ParameterValue": "subnet-03fbbe18a5b6b6661,subnet-019baffb30b832e94,subnet-0ab067e8d5edbff55"
+    }
+  ]
+  
